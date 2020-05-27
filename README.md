@@ -1,5 +1,5 @@
 # Bubble-Sort
-In this project the ruby enumerables methods are implemented. I.
+In this project the ruby enumerables methods are implemented.
 
 ![screenshot](/screenshot.png)
 

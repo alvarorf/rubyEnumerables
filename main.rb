@@ -1,30 +1,63 @@
-def bubble_sort(arr)
-  i = 0
-  for i in 0..(arr.length - 2)
-        next if arr[i] > arr[i + 1]
-            temp = arr[i]
-            arr[i] = arr[i + 1]
-            arr[i + 1] = temp
-        end
+module Enumerable
+def my_each
+  ind = 0
+  while ind < self.size
+      if block_given? 
+          yield self[ind]
+          ind += 1
+          self
+      else
+          return self.to_a
+      end
   end
-  return arr
-    end
-
-
-def bubble_sort_by(array)
-  loop_size = array.length
-  loop do
-    swap = false
-    (loop_size - 1).times do |i|
-      next unless yield(array[i], array[i + 1]).positive?
-
-      array[i], array[i + 1] = array[i + 1], array[i]
-      swap = true
-    end
-    break unless swap
-  end
-  array
 end
+
+def my_each_with_index
+  ind = 0
+  while ind < self.size
+      if block_given? 
+          yield self[ind], ind
+          ind += 1
+      else
+          return self
+      end
+  end
+end
+
+def my_select
+  return to_enum(:my_select) unless block_given? #It will return to enum if no block is found
+
+  result = []
+  my_each { |i| result << i if yield(i) }
+  result
+end
+
+def my_all? (m)
+  return m
+end
+
+def my_any? (m)
+  return m
+end
+
+def my_none? (m)
+  return m
+end
+
+def my_count (m)
+  return m
+end
+
+def my_map (m)
+  return m
+end
+
+def my_inject (m)
+  return m
+end
+
+
+
 
 puts bubble_sort([3, 1, 7])
 puts bubble_sort_by(%w[hi hello super hey hooy A]) { |left, right| left.length <=> right.length }
