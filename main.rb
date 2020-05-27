@@ -81,8 +81,17 @@ def my_count(arg = UNDEFINED)
   count
 end
 
-def my_map (m)
-  return m
+def my_map(my_proc = UNDEFINED)
+  return to_enum(:my_map) unless block_given?
+
+  result = []
+  arr = to_a
+  if my_proc == UNDEFINED
+    arr.my_each_with_index { |_, y| result << yield(arr[y]) }
+  else
+    arr.my_each_with_index { |_, y| result << my_proc.call(arr[y]) }
+  end
+  result
 end
 
 def my_inject (m)
