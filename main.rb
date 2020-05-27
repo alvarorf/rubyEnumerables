@@ -95,29 +95,34 @@ module Enumerable
   end
 
   def my_count(query = nil)
-    count = []
-    array = self.to_a
-    if !query.nil?
-      self.my_each do |item|
-        count.push(item) if item === query
-      end
-      count.length
-    else 
-      self.my_each_with_index { |item, index| count.push(index + 1) }
-      count[-1]
+    array = self
+    count = 0
+    if block_given?
+      array.length.times { |item| count += 1 if yield(array[item]) }
+    elsif !query.nil?
+      array.length.times { |item| count += 1 if array[item] == query }
+    elsif query.nil?
+      count = array.length
     end
+    count
   end
 
-  def my_map
-    #if no block is found it will return to enum
-    return to_enum unless block_given?
-    array = []
-    if block_given?
-      self.to_a.my_each do |item| 
-        array.push(yield(item))
+  def my_map(query = nil)
+    if query.nil?
+      return to_enum :my_map unless block_given?
+
+      array = []
+      to_a.my_each do |item|
+        array.push(yield(item)) if block_given?
       end
+      array
+    elsif query.class == Proc or block_given?
+      array = []
+      my_each do |item|
+        array << query.call(item)
+      end
+      array
     end
-    array
   end
 
   def my_inject(query = nil, query2 = nil )
