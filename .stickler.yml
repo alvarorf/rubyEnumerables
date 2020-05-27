@@ -8,7 +8,7 @@ linters:
 files:
   ignore:
     - "Guardfile"
-    - "tests.rb"
+    - 'tests.rb'
     - "Rakefile"
     - "node_modules/**/*"
     
