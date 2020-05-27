@@ -18,18 +18,6 @@ module Enumerable
   end
 
   def my_each_with_index(index = 0)
-    while index < self.size
-      if block_given?
-        yield self[index], index
-        index += 1
-      else
-        return self
-      end
-    end
-    self
-  end
-
-  def my_each_with_index(index = 0)
     while index < size
       return to_enum(:my_each_with_index) unless block_given?
 
@@ -37,6 +25,14 @@ module Enumerable
       index += 1
     end
     self
+  end
+
+  def my_select
+    return to_enum(:my_select) unless block_given?
+
+    result = []
+    my_each { |item| result << item if yield(item) == true }
+    result
   end
 
   def my_all?(query = nil)
@@ -56,7 +52,6 @@ module Enumerable
     end
     true
   end
-
 
   def my_any?(query = nil)
     obj = self
