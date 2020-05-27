@@ -12,105 +12,121 @@ def my_each
   end
 end
 
-def my_each_with_index
-  ind = 0
-  while ind < self.size
-      if block_given? 
-          yield self[ind], ind
-          ind += 1
-      else
-          return self
-      end
+def my_each_with_index(index = 0)
+  while index < self.size
+    if block_given?
+      yield self[index], index
+      index += 1
+    else
+      return self
+    end
   end
+  self
 end
 
 def my_select
-  return to_enum(:my_select) unless block_given? #It will return to enum if no block is found
-
+  #if no block is found it will return to enum
+  return to_enum unless block_given?
+  #this runs if block is found
   result = []
-  my_each { |i| result << i if yield(i) }
+  items = self
+  self.my_each { |item| result << item if yield(item) == true }
   result
 end
 
-def my_all?(arg = UNDEFINED)
-  unless block_given?
-    if arg != UNDEFINED
-      my_each { |x| return false unless arg === x }
-    else
-      my_each { |x| return false unless x }
+def my_all?(query = nil)
+  self.my_each do |idx| 
+    if query.is_a? Class
+      return false unless idx.is_a? query
+    elsif query.is_a? String or query.is_a? Integer
+      return false unless idx == query
+    elsif query.is_a? Regexp
+      return false unless idx.match(query)
+    elsif block_given?
+      return false unless yield(idx)
+    elsif self.length > 0
+      return false
+    elsif self == 0
+      return true
     end
-    return true
   end
-  my_each { |i| return false unless yield(i) }
   true
 end
 
-def my_any?(arg = UNDEFINED, &block)
-  unless block_given?
-    if arg != UNDEFINED
-      my_each { |x| return true if arg === x }
-    else
-      my_each { |x| return true if x }
-    end
-    return false
+def my_any?(*query)
+  if !query.empty?
+    my_each { |item| return true if item == query }
+  elsif block_given?
+    my_each { |item| return true if yield(item) }
+  else
+    my_each { |item| return true if item }
   end
-  my_each { |i| return true if block.call(i) }
   false
 end
 
-def my_none?(arg = UNDEFINED, &block)
-  !my_any?(arg, &block)
+def my_none?(query = nil)
+  #p query
+  if !query.nil?
+    self.to_a.my_each { |item| return false if query == item }
+  elsif query.is_a? Class
+    #not working
+    self.my_each { |item| return false if item === query }
+  elsif block_given?
+    self.my_each { |item| return false if yield(item) }
+  else
+    self.my_each { |item| return false if item }
+  end
+  true
 end
 
-
-def my_count(arg = UNDEFINED)
-  arr = if arg.is_a? String
-          split('')
-        else
-          arg
-        end
-  count = 0
-  unless block_given?
-    if arg != UNDEFINED
-      arr.my_each { |x| count += 1 if x == arg }
-      return count
+def my_count(query = nil)
+  count = []
+  array = self.to_a
+  if !query.nil?
+    self.my_each do |item|
+      count.push(item) if item === query
     end
-    return length
+    count.length
+  else 
+    self.my_each_with_index { |item, index| count.push(index + 1) }
+    count[-1]
   end
-  my_each { |i| count += 1 if yield(i) }
-  count
 end
 
-def my_map(my_proc = UNDEFINED)
-  return to_enum(:my_map) unless block_given?
+def my_map
+  #if no block is found it will return to enum
+  return to_enum unless block_given?
+  array = []
+  if block_given?
+    self.to_a.my_each do |item| 
+      array.push(yield(item))
+    end
+  end
+  array
+end
 
-  result = []
-  arr = to_a
-  if my_proc == UNDEFINED
-    arr.my_each_with_index { |_, y| result << yield(arr[y]) }
+def my_inject(query = nil, query2 = nil )
+  array = self.to_a
+  #need to loop query indexes here
+  if block_given?
+    array.push(query)
+    block_return = 1
+    array.my_each do |item|
+      block_return = yield(block_return, item)
+    end
+    block_return
+  elsif query2.nil? and query.is_a? Symbol
+    array.reduce(0) do |sum, num|
+      sum << num.public_send(query, num += 1)
+    end
+    sum
   else
-    arr.my_each_with_index { |_, y| result << my_proc.call(arr[y]) }
+    array.push(query)
+    array
   end
-  result
 end
 
-def my_inject(*arg)
-  new_arr = to_a
-  accumulator = arg[0]
-  if arg[0].class == Symbol
-    accumulator = new_arr[0]
-    new_arr = new_arr[1..-1]
-    new_arr.my_each { |x| accumulator = accumulator.send(arg[0], x) }
-  elsif arg[0].class < Numeric && arg[1].class != Symbol
-    new_arr.my_each { |x| accumulator = yield(accumulator, x) }
-  elsif arg[0].class < Numeric && arg[1].class == Symbol
-    new_arr.my_each { |x| accumulator = accumulator.send(arg[1], x) }
-  else
-    accumulator = new_arr[0]
-    new_arr = new_arr[1..-1]
-    new_arr.my_each { |x| accumulator = yield(accumulator, x) }
-  end
-  accumulator
+def multiply_els(array)
+  array.to_a.my_inject(1) { |a, b| a * b }
 end
-  
-    
+end

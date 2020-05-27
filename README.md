@@ -1,5 +1,7 @@
 # Bubble-Sort
-In this project the ruby enumerables methods are implemented.
+In this project the ruby enumerables methods are implemented. The purpose of this project is to gain a better understanding of the methods in Ruby's enumerable modules and to understand the usage of loops and blocks.
+
+Here is a screenshot:
 
 ![screenshot](/screenshot.png)
 
@@ -7,10 +9,14 @@ In this project the ruby enumerables methods are implemented.
 
 - Ruby
 - Visual Studio Code
+- Rubocop
 
 ## Getting Started
 
-To get a local copy up and running follow these simple example steps.
+Clone directory and run with Ruby by executing:
+`ruby main.rb` in the main folder.
+To run the tests, just type: `ruby tests.rb`
+
 
 ### Prerequisites
 - OS: MacOS, Ubuntu or a Virtual Machine
