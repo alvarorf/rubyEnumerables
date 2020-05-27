@@ -125,21 +125,33 @@ module Enumerable
     end
   end
 
-  def my_inject(query = nil, query2 = nil )
-    array = self.to_a
-    # need to loop query indexes here
-    if block_given?
-      array.push(query)
-      block_return = 1
-      array.my_each do |item|
+  def my_inject(query = nil, query2 = nil)
+    array = to_a
+    block_return = ''.to_i
+    if block_given? and query.nil?
+      block_return = array.shift
+      for item in array do
         block_return = yield(block_return, item)
       end
       block_return
-    elsif query2.nil? and query.is_a? Symbol
-      array.reduce(0) do |sum, num|
-        sum << num.public_send(query, num += 1)
+    elsif block_given? and query2.nil? and query.class == Integer
+      array.push(query)
+      block_return = array.shift
+      for item in array do
+        block_return = yield(block_return, item)
+      end
+      block_return
+    elsif query2.class == Symbol
+      sum = query
+      array.my_each do |item|
+        sum = sum.public_send(query2, item)
       end
       sum
+    elsif query.class == Symbol
+      array = array.reduce(0) do |sum, num|
+        sum.public_send(query, num)
+      end
+      array
     else
       array.push(query)
       array
