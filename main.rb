@@ -62,8 +62,23 @@ def my_none?(arg = UNDEFINED, &block)
   !my_any?(arg, &block)
 end
 
-def my_count (m)
-  return m
+
+def my_count(arg = UNDEFINED)
+  arr = if arg.is_a? String
+          split('')
+        else
+          arg
+        end
+  count = 0
+  unless block_given?
+    if arg != UNDEFINED
+      arr.my_each { |x| count += 1 if x == arg }
+      return count
+    end
+    return length
+  end
+  my_each { |i| count += 1 if yield(i) }
+  count
 end
 
 def my_map (m)
@@ -73,11 +88,4 @@ end
 def my_inject (m)
   return m
 end
-
-
-
-
-puts bubble_sort([3, 1, 7])
-puts bubble_sort_by(%w[hi hello super hey hooy A]) { |left, right| left.length <=> right.length }
-
     
