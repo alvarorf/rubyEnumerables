@@ -1,13 +1,18 @@
 module Enumerable
   def my_each
     index = 0
-    while index < self.size
-      if block_given? 
+    array = to_a
+    if block_given?
+      for item in 0..array.length - 1
+        yield(self[item])
+      end
+    else
+      while index < array.size
+        return to_enum(:my_each) unless block_given?
+
         yield self[index]
         index += 1
-        self
-      else
-        return self.to_a
+        return self
       end
     end
   end
@@ -27,7 +32,7 @@ module Enumerable
   def my_select
     # if no block is found it will return to enum
     return to_enum unless block_given?
-    
+
     # this runs if block is found
     result = []
     items = self
