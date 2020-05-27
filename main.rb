@@ -29,32 +29,30 @@ module Enumerable
     self
   end
 
-  def my_select
-    # if no block is found it will return to enum
-    return to_enum unless block_given?
+  def my_each_with_index(index = 0)
+    while index < size
+      return to_enum(:my_each_with_index) unless block_given?
 
-    # this runs if block is found
-    result = []
-    items = self
-    self.my_each { |item| result << item if yield(item) == true }
-    result
+      yield self[index], index
+      index += 1
+    end
+    self
   end
 
   def my_all?(query = nil)
-    self.my_each do |idx| 
-      if query.is_a? Class
-        return false unless idx.is_a? query
-      elsif query.is_a? String or query.is_a? Integer
-        return false unless idx == query
-      elsif query.is_a? Regexp
-        return false unless idx.match(query)
-      elsif block_given?
-        return false unless yield(idx)
-      elsif self.length.positive?
-        return false
-      elsif self == 0
-        return true
-      end
+    obj = self
+    if block_given?
+      length.times { |index| return false unless yield obj[index] }
+    elsif query.is_a? Regexp
+      length.times { |index| return false unless obj[index].match query }
+    elsif query.is_a? Class
+      length.times { |index| return false unless obj[index].is_a? query }
+    elsif query.is_a? Numeric or query.is_a? String
+      length.times { |index| return false unless obj[index] == query }
+    elsif query.is_a? Proc
+      length.times { |index| return false unless yield(index) }
+    else
+      length.times { |index| return false unless obj[index] }
     end
     true
   end
