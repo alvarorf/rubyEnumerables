@@ -57,28 +57,39 @@ module Enumerable
     true
   end
 
-  def my_any?(*query)
-    if !query.empty?
-      my_each { |item| return true if item == query }
-    elsif block_given?
-      my_each { |item| return true if yield(item) }
+
+  def my_any?(query = nil)
+    obj = self
+    if block_given?
+      length.times { |index| return true if yield obj[index] }
+    elsif query.is_a? Regexp
+      length.times { |index| return true if obj[index].match query }
+    elsif query.is_a? Class
+      length.times { |index| return true if obj[index].is_a? query }
+    elsif query.is_a? Numeric or query.is_a? String
+      length.times { |index| return true if obj[index] == query }
+    elsif query.is_a? Proc
+      length.times { |index| return true if yield(index) }
     else
-      my_each { |item| return true if item }
+      length.times { |index| return true if obj[index] }
     end
     false
   end
 
   def my_none?(query = nil)
-    #p query
-    if !query.nil?
-      self.to_a.my_each { |item| return false if query == item }
+    obj = self
+    if block_given?
+      length.times { |index| return false if yield obj[index] }
+    elsif query.is_a? Regexp
+      length.times { |index| return false if obj[index].match query }
     elsif query.is_a? Class
-      #not working
-      self.my_each { |item| return false if item === query }
-    elsif block_given?
-      self.my_each { |item| return false if yield(item) }
+      length.times { |index| return false if obj[index].is_a? query }
+    elsif query.is_a? Numeric or query.is_a? String
+      length.times { |index| return false if obj[index] == query }
+    elsif query.is_a? Proc
+      length.times { |index| return false if yield(index) }
     else
-      self.my_each { |item| return false if item }
+      length.times { |index| return false if obj[index] }
     end
     true
   end
