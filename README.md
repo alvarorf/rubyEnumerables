@@ -1,4 +1,4 @@
-# Bubble-Sort
+# Enumerables
 In this project the ruby enumerables methods are implemented. The purpose of this project is to gain a better understanding of the methods in Ruby's enumerable modules and to understand the usage of loops and blocks.
 
 Here is a screenshot:
